@@ -32,12 +32,12 @@ INITIALIZE_EASYLOGGINGPP
 const int OK = EXIT_SUCCESS;
 const int NOK = EXIT_FAILURE;
 
-std::condition_variable terminate;
+std::condition_variable condition;
 std::mutex mutex;
 
 void onsignal(int value)
 {
-  terminate.notify_one();
+  condition.notify_one();
 }
 
 int main(int argc, char** argv)
@@ -208,7 +208,7 @@ int main(int argc, char** argv)
     else
     {
       std::unique_lock lock(mutex);
-      terminate.wait(lock);
+      condition.wait(lock);
     }
   }
 

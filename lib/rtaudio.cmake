@@ -58,6 +58,13 @@ if(rtaudio_ADDED)
 
   endif()
 
+  if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+
+    target_compile_definitions(rtaudio
+      PUBLIC -D__WINDOWS_WASAPI__)
+
+  endif()
+
   #####################
   # DISABLED WARNINGS #
   #####################

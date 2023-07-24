@@ -58,6 +58,16 @@ if(rtmidi_ADDED)
 
   endif()
 
+  if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+
+    target_compile_definitions(rtmidi
+      PUBLIC -D__WINDOWS_MM__)
+
+    target_link_libraries(rtmidi
+      PUBLIC winmm)
+
+  endif()
+
   #####################
   # DISABLED WARNINGS #
   #####################

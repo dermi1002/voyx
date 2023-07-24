@@ -47,6 +47,18 @@ else()
 
 endif()
 
+if (MSVC)
+
+  # enable math constants like M_PI
+  target_compile_definitions(voyx
+    PRIVATE _USE_MATH_DEFINES)
+
+  # disable min/max macros in windef.h
+  target_compile_definitions(voyx
+    PRIVATE NOMINMAX)
+
+endif()
+
 if (UNIX)
 
   target_link_libraries(voyx

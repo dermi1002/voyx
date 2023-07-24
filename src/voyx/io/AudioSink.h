@@ -32,7 +32,7 @@ private:
   };
 
   const std::string audio_device_name;
-  std::binary_semaphore audio_sync_semaphore;
+  std::counting_semaphore<> audio_sync_semaphore;
   FIFO<OutputFrame> audio_frame_buffer;
   SRC<sample_t> audio_samplerate_converter;
 

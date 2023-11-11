@@ -12,9 +12,9 @@ public:
 
   FFT(const size_t framesize) :
     fullsize(framesize),
-    halfsize(framesize / 2 + 1)
+    halfsize(framesize / 2 + /* nyquist */ 1)
   {
-    voyxassert(framesize && !(framesize & (framesize - 1)));
+    voyxassert(framesize && !(framesize & (framesize - 1))); // power of two
   }
 
   size_t framesize() const

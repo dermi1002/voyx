@@ -8,15 +8,15 @@ class Vocoder
 
 public:
 
-  Vocoder(const double samplerate, const size_t framesize, const size_t hopsize) :
+  Vocoder(const double samplerate, const size_t framesize, const size_t hopsize, const std::optional<size_t> dftsize = std::nullopt) :
     framesize(framesize),
     hopsize(hopsize),
-    dftsize(framesize / 2),
-    freqinc(samplerate / framesize),
-    phaseinc(pi * hopsize / framesize)
+    dftsize(dftsize       ? dftsize.value() : framesize / 2 + /* nyquist */ 1),
+    freqinc(samplerate    / (dftsize ? dftsize.value()  * 2 - /* nyquist */ 2 : framesize)),
+    phaseinc(pi * hopsize / (dftsize ? dftsize.value()  * 2 - /* nyquist */ 2 : framesize))
   {
-    analysis.buffer.resize(dftsize + 1);
-    synthesis.buffer.resize(dftsize + 1);
+    analysis.buffer.resize(this->dftsize);
+    synthesis.buffer.resize(this->dftsize);
   }
 
   void encode(voyx::matrix<std::complex<T>> dfts)

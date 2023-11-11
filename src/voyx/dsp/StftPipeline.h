@@ -10,12 +10,12 @@ class StftPipeline : public SyncPipeline<sample_t>
 
 public:
 
-  StftPipeline(const double samplerate, const size_t framesize, const size_t hopsize, std::shared_ptr<Source<sample_t>> source, std::shared_ptr<Sink<sample_t>> sink) :
+  StftPipeline(const double samplerate, const size_t framesize, const size_t hopsize, const size_t dftsize, std::shared_ptr<Source<sample_t>> source, std::shared_ptr<Sink<sample_t>> sink) :
     SyncPipeline<sample_t>(source, sink),
     samplerate(samplerate),
     framesize(framesize),
     hopsize(hopsize),
-    stft(framesize, hopsize)
+    stft(framesize, hopsize, dftsize)
   {
     data.dfts.resize(stft.hops().size() * stft.size());
   }

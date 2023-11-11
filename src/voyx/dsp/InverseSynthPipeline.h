@@ -11,7 +11,7 @@ class InverseSynthPipeline : public StftPipeline<>
 
 public:
 
-  InverseSynthPipeline(const double samplerate, const size_t framesize, const size_t hopsize,
+  InverseSynthPipeline(const double samplerate, const size_t framesize, const size_t hopsize, const size_t dftsize,
                        std::shared_ptr<Source<sample_t>> source, std::shared_ptr<Sink<sample_t>> sink,
                        std::shared_ptr<MidiObserver> midi, std::shared_ptr<Plot> plot);
 

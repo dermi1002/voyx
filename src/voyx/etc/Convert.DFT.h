@@ -39,7 +39,7 @@ namespace $$::dft
   {
     static_assert(std::is_arithmetic<T>::value);
 
-    std::vector<T> values(framesize / 2 + 1);
+    std::vector<T> values(framesize / 2 + /* nyquist */ 1);
     std::iota(values.begin(), values.end(), 0);
 
     return values;
@@ -50,7 +50,7 @@ namespace $$::dft
   {
     static_assert(std::is_floating_point<T>::value);
 
-    std::vector<T> values(framesize / 2 + 1);
+    std::vector<T> values(framesize / 2 + /* nyquist */ 1);
     std::iota(values.begin(), values.end(), 0);
     std::transform(values.begin(), values.end(), values.begin(),
       [samplerate, framesize](T i) { return $$::dft::freq(i, samplerate, framesize); });

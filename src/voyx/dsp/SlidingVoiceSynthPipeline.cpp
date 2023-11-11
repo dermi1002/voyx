@@ -8,7 +8,7 @@ SlidingVoiceSynthPipeline::SlidingVoiceSynthPipeline(const double samplerate, co
   SdftPipeline(samplerate, framesize, dftsize, source, sink),
   midi(midi),
   plot(plot),
-  vocoder(samplerate, dftsize * 2, 1),
+  vocoder(samplerate, framesize, 1, dftsize),
   lifter(1e-3, samplerate, dftsize * 2),
   pda({ 50, 1000 }, samplerate),
   ptr(442)

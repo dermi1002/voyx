@@ -13,18 +13,28 @@ class STFT
 
 public:
 
-  STFT(const size_t framesize, const size_t hopsize) :
+  STFT(const size_t framesize, const size_t hopsize, const size_t dftsize) :
     framesize(framesize),
     hopsize(hopsize),
-    fft(framesize)
+    dftsize(dftsize),
+    fft(dftsize * 2 - /* nyquist */ 2)
   {
-    const std::vector<T> window = $$::window<T>(framesize);
+    voyxassert(fft.dftsize() == dftsize);
+    voyxassert(fft.framesize() >= framesize);
 
-    windows.analysis = window;
-    windows.synthesis = window;
+    if (framesize == fft.framesize())
+    {
+      windows.analysis  = $$::window<T>(framesize);
+      windows.synthesis = windows.analysis;
+    }
+    else
+    {
+      windows.analysis  = $$::asymmetric_analysis_window<T>(fft.framesize(), framesize);
+      windows.synthesis = $$::asymmetric_synthesis_window<T>(fft.framesize(), framesize);
+    }
 
     const T unitygain = hopsize / std::inner_product(
-      windows.synthesis.begin(), windows.synthesis.end(), windows.synthesis.begin(), T(0));
+      windows.analysis.begin(), windows.analysis.end(), windows.synthesis.begin(), T(0));
 
     std::transform(windows.synthesis.begin(), windows.synthesis.end(), windows.synthesis.begin(),
       [unitygain](T value) { return value * unitygain; });
@@ -34,14 +44,14 @@ public:
       data.hops.push_back(hop);
     }
 
-    data.input.resize(framesize * 2);
-    data.output.resize(framesize * 2);
-    data.frames.resize(framesize * data.hops.size());
+    data.input.resize(fft.framesize()  + framesize);
+    data.output.resize(fft.framesize() + framesize);
+    data.frames.resize(fft.framesize() * data.hops.size());
   }
 
   size_t size() const
   {
-    return fft.dftsize();
+    return dftsize;
   }
 
   const std::vector<size_t>& hops() const
@@ -51,23 +61,30 @@ public:
 
   const voyx::vector<T> signal() const
   {
-    return data.input;
+    return voyx::vector(data.input.data() + framesize, fft.framesize());
   }
 
   void stft(const voyx::vector<T> samples, voyx::matrix<std::complex<F>> dfts)
   {
-    for (size_t i = 0; i < framesize; ++i)
+    voyxassert(samples.size() == framesize);
+    voyxassert(dfts.size() == data.hops.size());
+    voyxassert(dfts.stride() == fft.dftsize());
+
+    for (size_t i = 0; i < fft.framesize(); ++i)
     {
       const size_t j = i + framesize;
 
       data.input[i] = data.input[j];
-      data.input[j] = samples[i];
-
-      data.output[i] = data.output[j];
-      data.output[j] = 0;
     }
 
-    voyx::matrix<F> frames(data.frames, framesize);
+    for (size_t i = 0; i < framesize; ++i)
+    {
+      const size_t j = i + fft.framesize();
+
+      data.input[j] = samples[i];
+    }
+
+    voyx::matrix<F> frames(data.frames, fft.framesize());
 
     reject(frames, data.input, data.hops, windows.analysis);
 
@@ -76,7 +93,11 @@ public:
 
   void istft(const voyx::matrix<std::complex<F>> dfts, voyx::vector<T> samples)
   {
-    voyx::matrix<F> frames(data.frames, framesize);
+    voyxassert(dfts.size() == data.hops.size());
+    voyxassert(dfts.stride() == fft.dftsize());
+    voyxassert(samples.size() == framesize);
+
+    voyx::matrix<F> frames(data.frames, fft.framesize());
 
     fft.ifft(dfts, frames);
 
@@ -86,12 +107,21 @@ public:
     {
       samples[i] = data.output[i];
     }
+
+    for (size_t i = 0; i < fft.framesize(); ++i)
+    {
+      const size_t j = i + framesize;
+
+      data.output[i] = data.output[j];
+      data.output[j] = 0;
+    }
   }
 
 private:
 
   const size_t framesize;
   const size_t hopsize;
+  const size_t dftsize;
 
   const FFT<F> fft;
 

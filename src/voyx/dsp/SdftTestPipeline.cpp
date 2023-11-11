@@ -6,7 +6,7 @@ SdftTestPipeline::SdftTestPipeline(const double samplerate, const size_t framesi
                                    std::shared_ptr<Source<sample_t>> source, std::shared_ptr<Sink<sample_t>> sink,
                                    std::shared_ptr<MidiObserver> midi, std::shared_ptr<Plot> plot) :
   SdftPipeline(samplerate, framesize, dftsize, source, sink),
-  vocoder(samplerate, dftsize * 2, 1),
+  vocoder(samplerate, framesize, 1, dftsize),
   midi(midi),
   plot(plot)
 {

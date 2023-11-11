@@ -176,16 +176,16 @@ int main(int argc, char** argv)
   std::shared_ptr<Plot> plot = nullptr;
   #endif
 
-  const size_t dftsize = 1*1024;
+  const size_t dftsize = 1*1024 + /* nyquist */ 1;
 
   // auto pipe = std::make_shared<BypassPipeline>(source, sink);
   // auto pipe = std::make_shared<InverseSynthPipeline>(samplerate, framesize, hopsize, source, sink, observer, plot);
-  auto pipe = std::make_shared<QdftTestPipeline>(samplerate, framesize, source, sink, observer, plot);
+  // auto pipe = std::make_shared<QdftTestPipeline>(samplerate, framesize, source, sink, observer, plot);
   // auto pipe = std::make_shared<RobotPipeline>(samplerate, framesize, dftsize, source, sink, observer, plot);
   // auto pipe = std::make_shared<SdftTestPipeline>(samplerate, framesize, dftsize, source, sink, observer, plot);
   // auto pipe = std::make_shared<SlidingVoiceSynthPipeline>(samplerate, framesize, dftsize, source, sink, observer, plot);
-  // auto pipe = std::make_shared<StftTestPipeline>(samplerate, framesize, hopsize, source, sink, observer, plot);
-  // auto pipe = std::make_shared<VoiceSynthPipeline>(samplerate, framesize, hopsize, source, sink, observer, plot);
+  // auto pipe = std::make_shared<StftTestPipeline>(samplerate, framesize, hopsize, dftsize, source, sink, observer, plot);
+  auto pipe = std::make_shared<VoiceSynthPipeline>(samplerate, framesize, hopsize, dftsize, source, sink, observer, plot);
 
   pipe->open();
 

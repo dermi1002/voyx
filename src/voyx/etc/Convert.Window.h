@@ -28,7 +28,7 @@ namespace $$
     const auto left = $$::window<T>(2 * n - 2 * m);
     const auto right = $$::window<T>(2 * m);
 
-    std::vector<T> window(analysis_window_size);
+    std::vector<T> window(n);
 
     for (size_t i = 0; i < n - m; ++i)
     {
@@ -52,7 +52,7 @@ namespace $$
     const auto left = $$::window<T>(2 * n - 2 * m);
     const auto right = $$::window<T>(2 * m);
 
-    std::vector<T> window(analysis_window_size);
+    std::vector<T> window(n);
 
     for (size_t i = 0; i < m; ++i)
     {

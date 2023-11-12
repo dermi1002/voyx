@@ -105,7 +105,9 @@ public:
 
     for (size_t i = 0; i < framesize; ++i)
     {
-      samples[i] = data.output[i];
+      const size_t j = i + fft.framesize() - framesize;
+
+      samples[i] = data.output[j];
     }
 
     for (size_t i = 0; i < fft.framesize(); ++i)

@@ -144,7 +144,7 @@ namespace voyx
 
     voyx::matrix<T>& operator=(const T& other)
     {
-      std::fill(this->data(), this->data() + this->size(), other);
+      std::fill(this->data(), this->data() + this->size() * this->stride(), other);
 
       return *this;
     }

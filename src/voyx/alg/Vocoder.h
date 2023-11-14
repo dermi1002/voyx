@@ -11,12 +11,40 @@ public:
   Vocoder(const double samplerate, const size_t framesize, const size_t hopsize, const std::optional<size_t> dftsize = std::nullopt) :
     framesize(framesize),
     hopsize(hopsize),
-    dftsize(dftsize       ? dftsize.value() : framesize / 2 + /* nyquist */ 1),
-    freqinc(samplerate    / (dftsize ? dftsize.value()  * 2 - /* nyquist */ 2 : framesize)),
-    phaseinc(pi * hopsize / (dftsize ? dftsize.value()  * 2 - /* nyquist */ 2 : framesize))
+    dftsize(dftsize)
   {
-    analysis.buffer.resize(this->dftsize);
-    synthesis.buffer.resize(this->dftsize);
+    const T pi = T(2) * std::acos(T(-1));
+
+    if (dftsize)
+    {
+      const size_t dftframesize = dftsize.value() * 2 - /* nyquist */ 2;
+
+      freqinc = samplerate / dftframesize;
+      phaseinc = pi * hopsize / dftframesize;
+
+      synthesis.timeshift.resize(dftsize.value());
+
+      for (size_t i = 0; i < dftsize.value(); ++i)
+      {
+        // compensate asymmetric synthesis window by virtual time shifting
+        synthesis.timeshift[i] = pi * i * T(framesize) / dftsize.value();
+      }
+
+      analysis.buffer.resize(dftsize.value());
+      synthesis.buffer.resize(dftsize.value());
+    }
+    else
+    {
+      const size_t framedftsize = framesize / 2 + /* nyquist */ 1;
+
+      freqinc = samplerate / framesize;
+      phaseinc = pi * hopsize / framesize;
+
+      synthesis.timeshift.resize(framedftsize);
+
+      analysis.buffer.resize(framedftsize);
+      synthesis.buffer.resize(framedftsize);
+    }
   }
 
   void encode(voyx::matrix<std::complex<T>> dfts)
@@ -71,7 +99,7 @@ public:
 
       delta = (i + j) * phaseinc;
 
-      phase = synthesis.buffer[i] += delta;
+      phase = (synthesis.buffer[i] += delta) - synthesis.timeshift[i];
 
       dft[i] = std::polar<T>(dft[i].real(), phase);
     }
@@ -79,14 +107,12 @@ public:
 
 private:
 
-  const T pi = T(2) * std::acos(T(-1));
-
   const size_t framesize;
   const size_t hopsize;
-  const size_t dftsize;
+  const std::optional<size_t> dftsize;
 
-  const T freqinc;
-  const T phaseinc;
+  T freqinc;
+  T phaseinc;
 
   struct
   {
@@ -96,6 +122,7 @@ private:
 
   struct
   {
+    std::vector<T> timeshift;
     std::vector<T> buffer;
   }
   synthesis;

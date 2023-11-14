@@ -1,6 +1,7 @@
 #pragma once
 
 #include <voyx/Header.h>
+#include <voyx/alg/Lifter.h>
 #include <voyx/alg/Vocoder.h>
 #include <voyx/dsp/StftPipeline.h>
 #include <voyx/io/MidiObserver.h>
@@ -22,6 +23,7 @@ public:
 private:
 
   Vocoder<double> vocoder;
+  Lifter<double> lifter;
 
   std::shared_ptr<MidiObserver> midi;
   std::shared_ptr<Plot> plot;

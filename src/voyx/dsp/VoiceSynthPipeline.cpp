@@ -7,6 +7,7 @@ VoiceSynthPipeline::VoiceSynthPipeline(const double samplerate, const size_t fra
                                        std::shared_ptr<MidiObserver> midi, std::shared_ptr<Plot> plot) :
   StftPipeline(samplerate, framesize, hopsize, dftsize, source, sink),
   vocoder(samplerate, framesize, hopsize, dftsize),
+  lifter(1e-3, samplerate, dftsize * 2 - 2),
   midi(midi),
   plot(plot)
 {
@@ -45,11 +46,17 @@ void VoiceSynthPipeline::operator()(const size_t index,
 
   const double roi[] = { 0, samplerate / 2 };
 
+  std::vector<double> envelope(dfts.stride());
+
+  lifter.lowpass<$$::real>(dfts.front(), envelope);
+
   std::vector<phasor_t> buffer(factors.size() * dfts.stride());
   voyx::matrix<phasor_t> buffers(buffer, dfts.stride());
 
   for (auto dft : dfts)
   {
+    lifter.divide<$$::real>(dft, envelope);
+
     for (size_t i = 0; i < factors.size(); ++i)
     {
       $$::interp(dft, buffers[i], factors[i]);
@@ -72,6 +79,8 @@ void VoiceSynthPipeline::operator()(const size_t index,
         dft[i].real(0);
       }
     }
+
+    lifter.multiply<$$::real>(dft, envelope);
   }
 
   vocoder.decode(dfts);

@@ -43,6 +43,8 @@ void VoiceSynthPipeline::operator()(const size_t index,
 
   const std::vector<double> factors = { 0.5, 1.25, 1.5, 2 };
 
+  const double roi[] = { 0, samplerate / 2 };
+
   std::vector<phasor_t> buffer(factors.size() * dfts.stride());
   voyx::matrix<phasor_t> buffers(buffer, dfts.stride());
 
@@ -61,7 +63,14 @@ void VoiceSynthPipeline::operator()(const size_t index,
 
       dft[i] = buffers(j, i);
 
-      dft[i].imag(dft[i].imag() * factors[j]);
+      const auto frequency = dft[i].imag() * factors[j];
+
+      dft[i].imag(frequency);
+
+      if (frequency <= roi[0] || roi[1] <= frequency)
+      {
+        dft[i].real(0);
+      }
     }
   }
 

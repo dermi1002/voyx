@@ -133,10 +133,9 @@ private:
    **/
   inline static T wrap(const T phase)
   {
-    const T pi = T(2 * M_PI);
-    const T ip = T(M_1_PI / 2);
+    const T pi = T(2) * T(M_PI);
 
-    return phase - pi * std::floor(phase * ip + T(0.5));
+    return phase - pi * std::floor(phase / pi + T(0.5));
   }
 
   /**

@@ -133,9 +133,10 @@ private:
    **/
   inline static T wrap(const T phase)
   {
-    const T PI = T(2) * T(M_PI);
+    const T pi = T(2 * M_PI);
+    const T ip = T(M_1_PI / 2);
 
-    return phase - PI * std::floor(phase / PI + T(0.5));
+    return phase - pi * std::floor(phase * ip + T(0.5));
   }
 
   /**
@@ -159,9 +160,9 @@ private:
    **/
   inline static T atan2(const T y, const T x)
   {
-    const T PI = T(M_PI);
-    const T PI2 = T(M_PI_2);
-    const T PI4 = T(M_PI_4);
+    const T PI1 = T(M_PI);   // PI / 1
+    const T PI2 = T(M_PI_2); // PI / 2
+    const T PI4 = T(M_PI_4); // PI / 4
 
     const T A = PI4 + T(0.273);
     const T B = T(0.273);
@@ -183,7 +184,7 @@ private:
 
     if (y == 0)
     {
-      return (x > 0) ? 0 : PI;
+      return (x > 0) ? 0 : PI1;
     }
 
     switch (octant)
@@ -210,13 +211,13 @@ private:
       {
         const T q = absy / absx;
 
-        return +PI - (A - B * q) * q;
+        return +PI1 - (A - B * q) * q;
       }
       case 3: // v
       {
         const T q = absy / absx;
 
-        return -PI + (A - B * q) * q;
+        return -PI1 + (A - B * q) * q;
       }
       case 7: // vi
       {

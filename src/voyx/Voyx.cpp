@@ -22,6 +22,7 @@
 #include <voyx/dsp/RobotPipeline.h>
 #include <voyx/dsp/SdftTestPipeline.h>
 #include <voyx/dsp/SlidingVoiceSynthPipeline.h>
+#include <voyx/dsp/StftPitchShiftPipeline.h>
 #include <voyx/dsp/StftTestPipeline.h>
 #include <voyx/dsp/VoiceSynthPipeline.h>
 
@@ -184,8 +185,9 @@ int main(int argc, char** argv)
   // auto pipe = std::make_shared<RobotPipeline>(samplerate, framesize, dftsize, source, sink, observer, plot);
   // auto pipe = std::make_shared<SdftTestPipeline>(samplerate, framesize, dftsize, source, sink, observer, plot);
   // auto pipe = std::make_shared<SlidingVoiceSynthPipeline>(samplerate, framesize, dftsize, source, sink, observer, plot);
+  auto pipe = std::make_shared<StftPitchShiftPipeline>(samplerate, framesize, hopsize, dftsize, source, sink, observer, plot);
   // auto pipe = std::make_shared<StftTestPipeline>(samplerate, framesize, hopsize, dftsize, source, sink, observer, plot);
-  auto pipe = std::make_shared<VoiceSynthPipeline>(samplerate, framesize, hopsize, dftsize, source, sink, observer, plot);
+  // auto pipe = std::make_shared<VoiceSynthPipeline>(samplerate, framesize, hopsize, dftsize, source, sink, observer, plot);
 
   pipe->open();
 

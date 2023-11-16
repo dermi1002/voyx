@@ -29,6 +29,7 @@ target_link_libraries(voyx
           rtaudio
           rtmidi
           sdft
+          stftpitchshift
           xtensor
           xtl)
 

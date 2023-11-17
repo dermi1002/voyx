@@ -41,12 +41,8 @@ void StftPitchShiftPipeline::operator()(const size_t index,
     plot->plot(abs);
   }
 
-  std::vector<phasor_t> buffer(dfts.stride());
-
   for (auto dft : dfts)
   {
-    std::copy(dft.begin(), dft.end(), buffer.begin());
-    core.shiftpitch(buffer);
-    std::copy(buffer.begin(), buffer.end(), dft.begin());
+    core.shiftpitch(dft);
   }
 }

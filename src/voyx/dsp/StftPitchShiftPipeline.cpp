@@ -94,5 +94,5 @@ void StftPitchShiftPipeline::operator()(const size_t index, const voyx::vector<s
   std::fill(
     buffer.output.begin() + analysis_window_size,
     buffer.output.end(),
-    double(0));
+    0);
 }

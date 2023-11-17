@@ -57,19 +57,15 @@ void StftPitchShiftPipeline::operator()(const size_t index, const voyx::vector<s
   const auto analysis_window_size = std::get<0>(framesize);
   const auto synthesis_window_size = std::get<1>(framesize);
 
-  for (size_t i = 0; i < analysis_window_size; ++i)
-  {
-    const size_t j = i + synthesis_window_size;
+  std::copy(
+    buffer.input.begin() + synthesis_window_size,
+    buffer.input.end(),
+    buffer.input.begin());
 
-    buffer.input[i] = buffer.input[j];
-  }
-
-  for (size_t i = 0; i < synthesis_window_size; ++i)
-  {
-    const size_t j = i + analysis_window_size;
-
-    buffer.input[j] = input[i];
-  }
+  std::copy(
+    input.begin(),
+    input.end(),
+    buffer.input.begin() + analysis_window_size);
 
   size_t hop = 0;
 
@@ -85,18 +81,18 @@ void StftPitchShiftPipeline::operator()(const size_t index, const voyx::vector<s
     core->shiftpitch(dft);
   });
 
-  for (size_t i = 0; i < synthesis_window_size; ++i)
-  {
-    const size_t j = i + analysis_window_size - synthesis_window_size;
+  std::copy(
+    buffer.output.begin() - synthesis_window_size + analysis_window_size,
+    buffer.output.end() - synthesis_window_size,
+    output.begin());
 
-    output[i] = buffer.output[j];
-  }
+  std::copy(
+    buffer.output.begin() + synthesis_window_size,
+    buffer.output.end(),
+    buffer.output.begin());
 
-  for (size_t i = 0; i < analysis_window_size; ++i)
-  {
-    const size_t j = i + synthesis_window_size;
-
-    buffer.output[i] = buffer.output[j];
-    buffer.output[j] = 0;
-  }
+  std::fill(
+    buffer.output.begin() + analysis_window_size,
+    buffer.output.end(),
+    double(0));
 }

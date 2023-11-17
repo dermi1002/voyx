@@ -15,6 +15,7 @@ public:
     samplerate(samplerate),
     framesize(framesize),
     hopsize(hopsize),
+    dftsize(dftsize),
     stft(framesize, hopsize, dftsize)
   {
     data.dfts.resize(stft.hops().size() * stft.size());
@@ -25,6 +26,7 @@ protected:
   const double samplerate;
   const size_t framesize;
   const size_t hopsize;
+  const size_t dftsize;
 
   void operator()(const size_t index, const voyx::vector<sample_t> input, voyx::vector<sample_t> output) override
   {

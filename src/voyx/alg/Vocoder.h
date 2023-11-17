@@ -159,11 +159,11 @@ private:
    **/
   inline static T atan2(const T y, const T x)
   {
-    const T PI1 = T(M_PI);   // PI / 1
-    const T PI2 = T(M_PI_2); // PI / 2
-    const T PI4 = T(M_PI_4); // PI / 4
+    const T PI1 = T(M_PI);   // PI/1
+    const T PI2 = T(M_PI_2); // PI/2
+    const T PI4 = T(M_PI_4); // PI/4
 
-    const T A = PI4 + T(0.273);
+    const T A = T(0.273) + PI4;
     const T B = T(0.273);
 
     const T absy = std::abs(y);

@@ -28,8 +28,8 @@ StftPitchShiftPipeline::StftPitchShiftPipeline(const double samplerate, const si
   buffer.input.resize(total_buffer_size);
   buffer.output.resize(total_buffer_size);
 
-  stft = std::make_shared<STFT<double>>(this->framesize, hopsize),
-  core = std::make_shared<StftPitchShiftCore<double>>(this->framesize, hopsize, samplerate),
+  stft = std::make_shared<STFT<double>>(this->framesize, hopsize);
+  core = std::make_shared<StftPitchShiftCore<double>>(this->framesize, hopsize, samplerate);
 
   core->factors({ 1 });
   core->quefrency(0 * 1e-3);

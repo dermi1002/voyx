@@ -72,7 +72,7 @@ public:
 
     for (size_t i = 0; i < dft.size(); ++i)
     {
-      phase = arg(dft[i]); // instead of std::arg(dft[i])
+      phase = atan2(dft[i]);
 
       delta = phase - std::exchange(analysis.buffer[i], phase);
 
@@ -141,105 +141,48 @@ private:
   /**
    * Approximates the phase angle of the complex number z.
    **/
-  inline static T arg(const std::complex<T>& z)
+  inline static T atan2(const std::complex<T>& z)
   {
-    return atan2(z.imag(), z.real());
+    return atan2(z.imag(), z.real()); // instead of std::arg(z)
   }
 
   /**
-   * Approximates the arcus tangent of y/x according to [1] and [2].
+   * Arctangent approximation according to [1].
    *
-   * [1] Sreeraman Rajan and Sichun Wang and Robert Inkol and Alain Joyal
-   *     Efficient approximations for the arctangent function
-   *     IEEE Signal Processing Magazine (2006)
-   *     https://ieeexplore.ieee.org/document/1628884
-   *
-   * [2] Dmytro Mishkin
-   *     https://github.com/ducha-aiki/fast_atan2
+   * [1] Xavier Girones and Carme Julia and Domenec Puig
+   *     Full Quadrant Approximations for the Arctangent Function
+   *     IEEE Signal Processing Magazine (2013)
+   *     https://ieeexplore.ieee.org/document/6375931
    **/
   inline static T atan2(const T y, const T x)
   {
-    const T PI1 = T(M_PI);   // PI/1
-    const T PI2 = T(M_PI_2); // PI/2
-    const T PI4 = T(M_PI_4); // PI/4
-
-    const T A = T(0.273) + PI4;
-    const T B = T(0.273);
-
-    const T absy = std::abs(y);
-    const T absx = std::abs(x);
-
-    const int octant = ((absx <= absy) << 2) + ((y < 0) << 1) + ((x < 0) << 0);
-
-    if (x == 0 && y == 0)
+    if (y == 0 && x == 0)
     {
+      // skip approximation and return
+      // zero instead of NaN in this case
       return T(0);
     }
 
-    if (x == 0)
-    {
-      return (y > 0) ? +PI2 : -PI2;
-    }
+    // extract the sign bits
+    const int ys = std::signbit(y);
+    const int xs = std::signbit(x);
 
-    if (y == 0)
-    {
-      return (x > 0) ? 0 : PI1;
-    }
+    // determine the quadrant offset and sign
+    const int q = (ys & ~xs) * 4 + xs * 2;
+    const int s = (ys ^ xs) ? -1 : +1;
 
-    switch (octant)
-    {
-      case 0: // i
-      {
-        const T q = absy / absx;
+    // calculate the arctangent in the first quadrant
+    const T a = T(0.596227);
+    const T b = std::abs(a * y * x);
+    const T c = b + y * y;
+    const T d = b + x * x;
+    const T e = c / (c + d);
 
-        return +(A - B * q) * q;
-      }
-      case 4: // ii
-      {
-        const T q = absx / absy;
+    // translate it to the proper quadrant
+    const T phi = q + std::copysign(e, s);
 
-        return +PI2 - (A - B * q) * q;
-      }
-      case 5: // iii
-      {
-        const T q = absx / absy;
-
-        return +PI2 + (A - B * q) * q;
-      }
-      case 1: // iv
-      {
-        const T q = absy / absx;
-
-        return +PI1 - (A - B * q) * q;
-      }
-      case 3: // v
-      {
-        const T q = absy / absx;
-
-        return -PI1 + (A - B * q) * q;
-      }
-      case 7: // vi
-      {
-        const T q = absx / absy;
-
-        return -PI2 - (A - B * q) * q;
-      }
-      case 6: // vii
-      {
-        const T q = absx / absy;
-
-        return -PI2 + (A - B * q) * q;
-      }
-      case 2: // viii
-      {
-        const T q = absy / absx;
-
-        return -(A - B * q) * q;
-      }
-      default:
-      {
-        return T(0);
-      }
-    }
+    // translate the result from [0, 4) to [0, 2pi)
+    return phi * T(1.57079632679489661923);
   }
+
 };

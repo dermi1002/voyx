@@ -12,7 +12,7 @@
 #   export LDFLAGS="-L/opt/homebrew/opt/qt@5/lib"
 #   export CPPFLAGS="-I/opt/homebrew/opt/qt@5/include"
 #
-PATH="/opt/homebrew/opt/qt@5/bin:$PATH"
+# PATH="/opt/homebrew/opt/qt@5/bin:$PATH"
 #
 # ###########################################################################
 
